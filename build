@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir -p pkg
+
+go build -o pkg/cargo main.go
