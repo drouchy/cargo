@@ -1,7 +1,7 @@
 package main
 
 import (
-  "./cargo"
+  "github.com/drouchy/cargo/cargo"
   "os"
 )
 
