@@ -25,7 +25,7 @@ func (suite *ErrorsTestSuite) TestCreatesAnNewErrorSetsTheTimestamp (c *C) {
   error := NewError(200, "the message of the error")
   now := time.Now().UnixNano()
 
-  c.Assert(error.timestamp.UnixNano() < now && error.timestamp.UnixNano() > now - 1000, Equals, true)
+  c.Assert(error.timestamp.UnixNano() < now && error.timestamp.UnixNano() > now - 3000, Equals, true)
 }
 
 func (suite *ErrorsTestSuite) TestImplementsTheErrorInterface (c *C) {

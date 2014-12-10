@@ -5,6 +5,7 @@ import (
   "github.com/drouchy/dropletkit"
   "os"
   "os/user"
+  "fmt"
   "path"
 )
 
@@ -33,7 +34,11 @@ func CreateApp() *cli.App {
       Usage: "retreive your account information",
       Action: func (context *cli.Context) {
         config := LoadConfig(context.GlobalString("config_file"))
-        AccountCommand{writer: os.Stdout, error_writer: os.Stderr, config: config, fetcher: dropletkit.AccountFetcherImpl}.execute()
+        error := AccountCommand{writer: os.Stdout, error_writer: os.Stderr, config: config, fetcher: dropletkit.AccountFetcherImpl}.execute()
+        if(error != nil) {
+          fmt.Fprintln(os.Stderr, error.message)
+          os.Exit(error.code)
+        }
       },
     },
   }
