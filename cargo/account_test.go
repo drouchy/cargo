@@ -9,14 +9,16 @@ import (
 
 type AccountTestSuite struct{
   writer *bytes.Buffer
+  err_writer *bytes.Buffer
   command AccountCommand
 }
 
 var _ = Suite(&AccountTestSuite{})
 
 func (suite *AccountTestSuite) SetUpTest(c *C) {
-  suite.writer = new(bytes.Buffer)
-  suite.command = AccountCommand{config: defaultConfig(), writer: suite.writer, fetcher: mockFetcher}
+  suite.writer     = new(bytes.Buffer)
+  suite.err_writer = new(bytes.Buffer)
+  suite.command    = AccountCommand{config: defaultConfig(), writer: suite.writer, error_writer: suite.err_writer, fetcher: mockFetcher}
 }
 
 func (suite *AccountTestSuite) TearDownTest(c *C) {
@@ -47,10 +49,38 @@ func (suite *AccountTestSuite) TestWritesTheAccountDropletLimit (c *C) {
   c.Assert(line, Matches, ".*210.*")
 }
 
+func (suite *AccountTestSuite) TestReturnsNoError (c *C) {
+  error := suite.command.execute()
+
+  c.Assert(error, IsNil)
+}
+
+func (suite *AccountTestSuite) TestDoesNotWriteAnythingOnStdoutWhenIsNotAuthenticated (c *C) {
+  suite.command.fetcher = mockUnauthenticatedFetcher
+
+  suite.command.execute()
+
+  c.Assert(suite.writer.String(), Equals, "")
+}
+
+func (suite *AccountTestSuite) TestReturnsTheErrorWhenIsNotAuthenticated (c *C) {
+  suite.command.fetcher = mockUnauthenticatedFetcher
+
+  error := suite.command.execute()
+
+  c.Assert(error.code, Equals, 401)
+}
+
+
 func defaultConfig() Config{
   return Config{DigitalOcean: DigitalOcean{Token: "asdfghjkl;"}}
 }
 
-func mockFetcher(options dropletkit.Options) dropletkit.Account {
-  return dropletkit.Account{Uuid: "uuid1", Email: "foo@example.com", EmailVerified: true, DropletLimit: 210}
+func mockFetcher(options dropletkit.Options) (dropletkit.Account, error) {
+  return dropletkit.Account{Uuid: "uuid1", Email: "foo@example.com", EmailVerified: true, DropletLimit: 210}, nil
 }
+
+func mockUnauthenticatedFetcher(options dropletkit.Options) (dropletkit.Account, error) {
+  return dropletkit.Account{}, dropletkit.UnauthenticatedError
+}
+

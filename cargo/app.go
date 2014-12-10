@@ -33,7 +33,7 @@ func CreateApp() *cli.App {
       Usage: "retreive your account information",
       Action: func (context *cli.Context) {
         config := LoadConfig(context.GlobalString("config_file"))
-        AccountCommand{writer: os.Stdout, config: config, fetcher: dropletkit.AccountFetcherImpl}.execute()
+        AccountCommand{writer: os.Stdout, error_writer: os.Stderr, config: config, fetcher: dropletkit.AccountFetcherImpl}.execute()
       },
     },
   }

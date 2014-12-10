@@ -39,3 +39,9 @@ func (suite *ErrorsTestSuite) TestTheErrorCodeReturnsTheCode (c *C) {
 
   c.Assert(error.ErrorCode(), Equals, 1)
 }
+
+func (suite *ErrorsTestSuite) TestUnauthenticatedError (c *C) {
+  c.Assert(UnauthenticatedError("Digital Ocean").code, Equals, 401)
+  c.Assert(UnauthenticatedError("Digital Ocean").message, Equals, "Failed to authenticate to Digital Ocean")
+}
+
